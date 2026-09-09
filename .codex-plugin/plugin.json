@@ -1,0 +1,31 @@
+{
+  "name": "cep",
+  "version": "0.1.0",
+  "description": "Unified engineering plugin: scope, plan, build, check, ship, and learn. Forked from Compound Engineering, sharpened with pstack's execution discipline and gstack's outer-loop review, sign-off, and shipping practices.",
+  "license": "MIT",
+  "keywords": [
+    "compound-engineering",
+    "pstack",
+    "gstack",
+    "workflow",
+    "code-review",
+    "planning",
+    "deployment"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "cep",
+    "shortDescription": "Scope, plan, build, check, ship, and learn — one command surface across three engineering disciplines.",
+    "longDescription": "cep unifies six phases of engineering work behind six commands: Scope (product framing and specialist sign-off), Plan (implementation planning with type-first discipline), Build (execution with reproduce-first and prove-it-works gates), Check (debugging and tiered code review), Ship (QA through production deploy, gated behind safety hooks), and Learn (knowledge compounding). Tool names resolve per host via references/codex-tools.md.",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Scope this feature before we plan it.",
+      "Ship this PR."
+    ]
+  }
+}

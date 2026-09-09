@@ -1,0 +1,15 @@
+{
+  "name": "cep",
+  "version": "0.1.0",
+  "description": "Unified engineering plugin: scope, plan, build, check, ship, and learn. Forked from Compound Engineering, sharpened with pstack's execution discipline and gstack's outer-loop review, sign-off, and shipping practices.",
+  "license": "MIT",
+  "keywords": [
+    "compound-engineering",
+    "pstack",
+    "gstack",
+    "workflow",
+    "code-review",
+    "planning",
+    "deployment"
+  ]
+}

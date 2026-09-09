@@ -1,0 +1,6 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "cep",
+  "version": "0.1.0",
+  "description": "Unified engineering plugin: scope, plan, build, check, ship, and learn. Forked from Compound Engineering, sharpened with pstack's execution discipline and gstack's outer-loop review, sign-off, and shipping practices."
+}
