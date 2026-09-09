@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# check-careful.sh — cep PreToolUse hook, Bash matcher.
+# check-careful.sh — cepg PreToolUse hook, Bash matcher.
 # Reads JSON from stdin, checks Bash command for destructive patterns.
 # Ported from gstack's careful/bin/check-careful.sh (function names renamed
-# gstack_* -> cep_*, GSTACK_HOME -> CEP_HOME — cosmetic only; detection logic,
+# gstack_* -> cepg_*, GSTACK_HOME -> CEPG_HOME — cosmetic only; detection logic,
 # tiering, and fail-safe polarity are unchanged). Unlike gstack, where this
 # check is only registered while a /careful session is active, this hook is
 # a standing plugin-scoped PreToolUse entry (hooks/hooks.json) — always on.
@@ -12,7 +12,7 @@
 #            (best-effort advisory hard-stop, not a policy boundary).
 #   MEDIUM — the destructive families below return "ask" (always overridable
 #            on Claude Code; escalated to "deny" on Codex — see
-#            cep_hook_decision_ask in hook-extract.sh).
+#            cepg_hook_decision_ask in hook-extract.sh).
 # The decision MUST be nested under hookSpecificOutput — Claude Code ignores a
 # top-level permissionDecision, which silently no-ops the warning.
 set -euo pipefail
@@ -29,13 +29,13 @@ _HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # install must degrade to an ASK (this is the ask-tier hook), never silence.
 _HOOK_HELPER="$_HOOK_DIR/hook-extract.sh"
 if [ ! -f "$_HOOK_HELPER" ] || ! . "$_HOOK_HELPER" 2>/dev/null; then
-  # cep_hook_decision_ask isn't available yet (that's the problem), so this
+  # cepg_hook_decision_ask isn't available yet (that's the problem), so this
   # one envelope is hand-built rather than routed through the missing helper.
-  # Codex escalation cannot apply here either (cep_is_codex isn't loaded) —
+  # Codex escalation cannot apply here either (cepg_is_codex isn't loaded) —
   # a broken install already fails toward the safer state on Claude Code
   # (a prompt); on Codex it fails open, same as gstack's original. Flagged as
   # a known gap rather than silently accepted.
-  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[cep] Hook helpers unavailable (broken install?) - cannot safety-check this command. Approve only if you know what it does."}}\n'
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"ask","permissionDecisionReason":"[cepg] Hook helpers unavailable (broken install?) - cannot safety-check this command. Approve only if you know what it does."}}\n'
   exit 0
 fi
 
@@ -55,14 +55,14 @@ fi
 # the ask-tier hook) when it cannot be parsed at all — a hook that gates
 # destructive commands must not allow-by-default on unreadable input.
 set +e
-CMD=$(cep_hook_extract_field "$INPUT" command)
+CMD=$(cepg_hook_extract_field "$INPUT" command)
 EXTRACT_RC=$?
 set -e
 
 # No parser available, or the payload is not parseable JSON. Fail toward ask
-# (escalates to deny on Codex via cep_hook_decision_ask).
+# (escalates to deny on Codex via cepg_hook_decision_ask).
 if [ "$EXTRACT_RC" -ne 0 ] && [ -n "$INPUT" ]; then
-  cep_hook_decision_ask "[cep] Could not parse the tool payload to safety-check this command. Approve only if you know what it does."
+  cepg_hook_decision_ask "[cepg] Could not parse the tool payload to safety-check this command. Approve only if you know what it does."
   exit 0
 fi
 
@@ -73,8 +73,8 @@ if [ -z "$CMD" ]; then
 fi
 
 # Log a hook fire event (pattern name only, never command content).
-# Shared helper respects CEP_HOME, so tests never write real analytics.
-_careful_log_fire() { cep_hook_log_fire destructive-command "$1"; }
+# Shared helper respects CEPG_HOME, so tests never write real analytics.
+_careful_log_fire() { cepg_hook_log_fire destructive-command "$1"; }
 
 # Normalize: lowercase for case-insensitive SQL matching
 CMD_LOWER=$(printf '%s' "$CMD" | tr '[:upper:]' '[:lower:]')
@@ -92,7 +92,7 @@ CMD_LOWER=$(printf '%s' "$CMD" | tr '[:upper:]' '[:lower:]')
 # primitives as a reason to ask: they are vanishingly rare in commands a human
 # actually means to run unattended.
 if printf '%s' "$CMD" | grep -qE '\$\{IFS\}|\$IFS|\$\(echo[^)]*base64[^)]*\)|base64[[:space:]]+(-d|--decode)[^|]*\|[[:space:]]*(sh|bash)' 2>/dev/null; then
-  cep_hook_decision_ask "[cep] Shell obfuscation detected (IFS word-splitting or base64-to-shell). Read the command carefully before approving."
+  cepg_hook_decision_ask "[cepg] Shell obfuscation detected (IFS word-splitting or base64-to-shell). Read the command carefully before approving."
   exit 0
 fi
 
@@ -109,13 +109,13 @@ fi
 # cannot arm the bypass indefinitely. Scoped to the force-push-to-default-
 # branch check only — rm -rf / is never a legitimate rollback action, so it
 # is deliberately NOT covered by this bypass.
-_cep_rollback_bypass_active() {
-  _crba_file="${CEP_HOME:-$HOME/.cep}/rollback-active.txt"
+_cepg_rollback_bypass_active() {
+  _crba_file="${CEPG_HOME:-$HOME/.cepg}/rollback-active.txt"
   [ -f "$_crba_file" ] || return 1
   _crba_armed_at=$(head -n 1 "$_crba_file" 2>/dev/null | tr -cd '0-9')
   [ -n "$_crba_armed_at" ] || return 1
   _crba_now=$(date -u +%s)
-  _crba_ttl="${CEP_ROLLBACK_TTL_SECS:-1800}"
+  _crba_ttl="${CEPG_ROLLBACK_TTL_SECS:-1800}"
   [ $(( _crba_now - _crba_armed_at )) -le "$_crba_ttl" ] 2>/dev/null
 }
 
@@ -156,7 +156,7 @@ if [ "$_IS_SIMPLE" -eq 1 ]; then
     set +f
     if [ "$_ROOT_TARGETS" -eq 1 ] && [ "$_SAFE_TARGETS" -eq 0 ]; then
       _careful_log_fire "high_rm_root"
-      cep_hook_decision deny "[cep][HIGH] Recursive delete of / or the home directory is blocked. If you truly mean it, run it outside an agent session."
+      cepg_hook_decision deny "[cepg][HIGH] Recursive delete of / or the home directory is blocked. If you truly mean it, run it outside an agent session."
       exit 0
     fi
   fi
@@ -209,7 +209,7 @@ if [ "$_IS_SIMPLE" -eq 1 ]; then
           [ -n "$_CURRENT_BRANCH" ] && [ "$_CURRENT_BRANCH" = "$_DEFAULT_BRANCH" ] && _TARGETS_DEFAULT=1
         fi
         if [ "$_TARGETS_DEFAULT" -eq 1 ]; then
-          if _cep_rollback_bypass_active; then
+          if _cepg_rollback_bypass_active; then
             # Confirmed, active-incident rollback in progress (state file
             # armed by the rollback-issuing skill, within TTL): do not hard
             # deny. Falls through to the MEDIUM tier below, which still
@@ -219,7 +219,7 @@ if [ "$_IS_SIMPLE" -eq 1 ]; then
             _careful_log_fire "high_force_push_default_rollback_bypass"
           else
             _careful_log_fire "high_force_push_default"
-            cep_hook_decision deny "[cep][HIGH] Force-push to the default branch ($_DEFAULT_BRANCH) is blocked. Use --force-with-lease on a feature branch, or arm the rollback bypass via a confirmed incident rollback if this is a deliberate recovery action."
+            cepg_hook_decision deny "[cepg][HIGH] Force-push to the default branch ($_DEFAULT_BRANCH) is blocked. Use --force-with-lease on a feature branch, or arm the rollback bypass via a confirmed incident rollback if this is a deliberate recovery action."
             exit 0
           fi
         fi
@@ -324,12 +324,12 @@ fi
 # self-containedly: a file at the current git repo's own top level, so no
 # external slug lookup or registry is needed.
 if [ -z "$WARN" ]; then
-  _CEP_HOME_DIR="${CEP_HOME:-$HOME/.cep}"
-  _PATTERN_FILES="$_CEP_HOME_DIR/destructive-patterns.txt"
+  _CEPG_HOME_DIR="${CEPG_HOME:-$HOME/.cepg}"
+  _PATTERN_FILES="$_CEPG_HOME_DIR/destructive-patterns.txt"
   _GIT_TOPLEVEL=$(git rev-parse --show-toplevel 2>/dev/null || true)
   if [ -n "$_GIT_TOPLEVEL" ]; then
     _PATTERN_FILES="$_PATTERN_FILES
-$_GIT_TOPLEVEL/.cep/destructive-patterns.txt"
+$_GIT_TOPLEVEL/.cepg/destructive-patterns.txt"
   fi
   while IFS= read -r _PF; do
     [ -f "$_PF" ] || continue
@@ -353,7 +353,7 @@ fi
 # --- Output ---
 if [ -n "$WARN" ]; then
   _careful_log_fire "$PATTERN"
-  cep_hook_decision_ask "[cep] $WARN"
+  cepg_hook_decision_ask "[cepg] $WARN"
 else
   echo '{}'
 fi

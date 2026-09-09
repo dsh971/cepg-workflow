@@ -59,7 +59,7 @@ function loadSkills() {
 // on OpenCode, /cepg-check-debug and /cepg-check-review surface as two commands.
 const skillCommands = loadSkills()
 
-export const CepPlugin = async () => ({
+export const CepgPlugin = async () => ({
   config: async (config) => {
     config.skills = config.skills || {}
     config.skills.paths = config.skills.paths || []
@@ -75,4 +75,4 @@ export const CepPlugin = async () => ({
   },
 })
 
-export default CepPlugin
+export default CepgPlugin

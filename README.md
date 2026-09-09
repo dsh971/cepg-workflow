@@ -1,6 +1,6 @@
-# cep
+# cepg
 
-One command surface across six phases of engineering work — scope, plan, build, check, ship, learn — for Claude Code and Codex.
+One command surface across six phases of engineering work — scope, plan, build, check, ship, learn — native on Claude Code, Codex, Cursor, Devin, Grok, Kimi, Antigravity, OpenCode, and Cline (see Platform support below).
 
 ## Why
 
@@ -10,7 +10,7 @@ Three projects each do part of this well and none do all of it:
 - **[pstack](https://github.com/michael-denyer/pstack-claude)** — type-first design, reproduce-first debugging, prove-it-works verification, adversarial review. Execution discipline.
 - **[gstack](https://github.com/garrytan/gstack)** — product/architecture/design sign-off, QA, security review, staged production deploys. Outer-loop bookends.
 
-cep forks Compound Engineering as its spine and mines specific techniques from pstack and gstack into native skills and hooks. Neither pstack nor gstack is installed as a live dependency — see `docs/plans/2026-09-04-001-feat-unified-ce-pstack-gstack-plugin-plan.md` for why, and `docs/brainstorms/2026-09-02-pstack-ce-plugin-merge-requirements.md` for the original scope.
+cepg forks Compound Engineering as its spine and mines specific techniques from pstack and gstack into native skills and hooks. Neither pstack nor gstack is installed as a live dependency — see `docs/plans/2026-09-04-001-feat-unified-ce-pstack-gstack-plugin-plan.md` for why, and `docs/brainstorms/2026-09-02-pstack-ce-plugin-merge-requirements.md` for the original scope.
 
 ## Commands
 
@@ -63,13 +63,13 @@ No architectural decisions, no sign-off needed for a change this bounded — `/c
 
 ## Prerequisites
 
-cep has no dedicated setup/preflight skill — a seventh command was deliberately left out to preserve the six-phase command surface (see the plan's Scope Boundaries). Before your first `/cepg-ship` run, confirm manually:
+cepg has no dedicated setup/preflight skill — a seventh command was deliberately left out to preserve the six-phase command surface (see the plan's Scope Boundaries). Before your first `/cepg-ship` run, confirm manually:
 
 - `gh` is installed and authenticated (`gh auth status`) — `/cepg-ship` uses it for PR creation and CI status.
 - The hook scripts are executable (`chmod +x hooks/*.sh`) if your platform's install step didn't preserve the bit.
-- `${CLAUDE_PLUGIN_DATA:-~/.cep}` is writable — this is where the safety hooks keep their state (e.g. the freeze boundary).
+- `${CLAUDE_PLUGIN_DATA:-~/.cepg}` is writable — this is where the safety hooks keep their state (e.g. the freeze boundary).
 
-Nothing in cep checks these for you ahead of time; a missing prerequisite surfaces as a failure mid-run rather than upfront.
+Nothing in cepg checks these for you ahead of time; a missing prerequisite surfaces as a failure mid-run rather than upfront.
 
 ## Platform support
 
@@ -81,7 +81,7 @@ Native on every platform Compound Engineering supports:
 | Codex | Native, `.codex-plugin/plugin.json` points at `skills/` |
 | Cursor, Devin, Grok, Kimi | Static manifest (`.cursor-plugin/`, `.devin-plugin/`, `.grok-plugin/`, `.kimi-plugin/`) pointing at `skills/` |
 | Antigravity | Root `plugin.json`; `.agy/plugin.json` and `.agy/skills` are symlinks to it |
-| OpenCode | `.opencode/plugins/cep.js` generates one command per skill from its frontmatter |
+| OpenCode | `.opencode/plugins/cepg.js` generates one command per skill from its frontmatter |
 | Cline | `.cline/scripts/install-skills.sh` symlinks skill directories into Cline's discovery path |
 
 No build step for any of these — they all read the same `skills/` directory. Codex-specific tool-name resolution lives in `references/codex-tools.md`; every skill's "Platform note" points there instead of restating the mapping inline.
@@ -92,4 +92,4 @@ No build step for any of these — they all read the same `skills/` directory. C
 
 ## Status
 
-Early scaffold — see the plan doc above for what's built vs. open. `cep` is a placeholder name.
+Early scaffold — see the plan doc above for what's built vs. open. `cepg` is a placeholder name.

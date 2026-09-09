@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Link cep's skills/ into Cline's skills discovery directory.
+# Link cepg's skills/ into Cline's skills discovery directory.
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -56,7 +56,7 @@ canonical_path() {
 
 SKILLS_ROOT_CANON="$(canonical_path "$SKILLS_SRC")"
 
-is_cep_owned_skill_link() {
+is_cepg_owned_skill_link() {
   local link_path="$1"
   [[ -L "$link_path" ]] || return 1
 
@@ -81,9 +81,9 @@ for skill_dir in "$SKILLS_SRC"/*/; do
   if grep -qE '^disable-model-invocation:[[:space:]]*true[[:space:]]*$' "${skill_dir}SKILL.md"; then
     is_manual=true
     if [[ "$INCLUDE_MANUAL" != "true" ]]; then
-      if is_cep_owned_skill_link "$target"; then
+      if is_cepg_owned_skill_link "$target"; then
         rm "$target"
-        echo "removed $name: stale cep manual-only symlink" >&2
+        echo "removed $name: stale cepg manual-only symlink" >&2
         manual_removed=$((manual_removed + 1))
       fi
       echo "skip $name: manual-only (disable-model-invocation)" >&2
@@ -100,7 +100,7 @@ for skill_dir in "$SKILLS_SRC"/*/; do
     continue
   fi
 
-  if [[ -L "$target" ]] && ! is_cep_owned_skill_link "$target"; then
+  if [[ -L "$target" ]] && ! is_cepg_owned_skill_link "$target"; then
     echo "skip $name: $target is an existing user-managed symlink (not overwritten)" >&2
     skipped=$((skipped + 1))
     continue

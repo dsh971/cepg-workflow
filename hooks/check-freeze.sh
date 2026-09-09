@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# check-freeze.sh — cep PreToolUse hook, Edit|Write matcher.
+# check-freeze.sh — cepg PreToolUse hook, Edit|Write matcher.
 # Reads JSON from stdin, checks if file_path is within the freeze boundary.
 # Returns a PreToolUse hookSpecificOutput with permissionDecision "deny" to
 # block, or {} to allow. Ported from gstack's freeze/bin/check-freeze.sh
-# (function names renamed gstack_* -> cep_*, GSTACK_HOME -> CEP_HOME —
+# (function names renamed gstack_* -> cepg_*, GSTACK_HOME -> CEPG_HOME —
 # cosmetic only; boundary logic, symlink resolution, and fail-safe polarity
 # are unchanged). Unlike gstack, where this check is only registered while a
 # /freeze session is active, this hook is a standing plugin-scoped
@@ -27,21 +27,21 @@ set -euo pipefail
 # Deny-tier backstop: any unexpected non-zero death (a failing pipeline under
 # set -e, a deleted cwd, EACCES) would otherwise exit with no decision JSON,
 # which Claude Code treats as non-blocking — the edit proceeds. Every
-# deliberate output below sets _CEP_FREEZE_DECIDED first so a late failure
+# deliberate output below sets _CEPG_FREEZE_DECIDED first so a late failure
 # after a decision never prints a second JSON object. Ported from gstack's
-# freeze/bin/check-freeze.sh — cep previously dropped this trap entirely,
+# freeze/bin/check-freeze.sh — cepg previously dropped this trap entirely,
 # which meant an unexpected crash silently allowed the edit through despite
 # this being a deny-tier boundary.
-_CEP_FREEZE_DECIDED=""
-_cep_freeze_backstop() {
+_CEPG_FREEZE_DECIDED=""
+_cepg_freeze_backstop() {
   local rc=$?
-  if [ "$rc" -ne 0 ] && [ -z "$_CEP_FREEZE_DECIDED" ]; then
-    _CEP_FREEZE_DECIDED=1
-    printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[cep] Hook failed unexpectedly (exit %s) - blocked, fail closed. Reinstall the plugin or clear the freeze boundary state file."}}\n' "$rc"
+  if [ "$rc" -ne 0 ] && [ -z "$_CEPG_FREEZE_DECIDED" ]; then
+    _CEPG_FREEZE_DECIDED=1
+    printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[cepg] Hook failed unexpectedly (exit %s) - blocked, fail closed. Reinstall the plugin or clear the freeze boundary state file."}}\n' "$rc"
     exit 0
   fi
 }
-trap _cep_freeze_backstop EXIT
+trap _cepg_freeze_backstop EXIT
 
 # Read stdin
 INPUT=$(cat)
@@ -61,18 +61,18 @@ _HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # (an if-guard cannot catch it) — the existence check must come first.
 _HOOK_HELPER="$_HOOK_DIR/hook-extract.sh"
 if [ ! -f "$_HOOK_HELPER" ] || ! . "$_HOOK_HELPER" 2>/dev/null; then
-  _CEP_FREEZE_DECIDED=1
-  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[cep] Hook helpers unavailable (broken install?) - blocked, fail closed. Reinstall the plugin or clear the freeze boundary state file."}}\n'
+  _CEPG_FREEZE_DECIDED=1
+  printf '{"hookSpecificOutput":{"hookEventName":"PreToolUse","permissionDecision":"deny","permissionDecisionReason":"[cepg] Hook helpers unavailable (broken install?) - blocked, fail closed. Reinstall the plugin or clear the freeze boundary state file."}}\n'
   exit 0
 fi
 
 # Locate the freeze boundary state file
-STATE_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.cep}"
+STATE_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.cepg}"
 FREEZE_FILE="$STATE_DIR/freeze-dir.txt"
 
 # If no freeze file exists, allow everything (no boundary configured)
 if [ ! -f "$FREEZE_FILE" ]; then
-  _CEP_FREEZE_DECIDED=1
+  _CEPG_FREEZE_DECIDED=1
   echo '{}'
   exit 0
 fi
@@ -91,28 +91,28 @@ esac
 
 # If freeze dir is empty, allow
 if [ -z "$FREEZE_DIR" ]; then
-  _CEP_FREEZE_DECIDED=1
+  _CEPG_FREEZE_DECIDED=1
   echo '{}'
   exit 0
 fi
 
 # Extract file_path from tool_input with the shared real-JSON parser.
 set +e
-FILE_PATH=$(cep_hook_extract_field "$INPUT" file_path)
+FILE_PATH=$(cepg_hook_extract_field "$INPUT" file_path)
 EXTRACT_RC=$?
 set -e
 
 # Unparseable payload (or no parser available): DENY. A boundary hook that
 # allows what it cannot read is not a boundary.
 if [ "$EXTRACT_RC" -ne 0 ] && [ -n "$INPUT" ]; then
-  cep_hook_decision deny "[cep] Could not parse the tool payload to check the freeze boundary. Blocked (fail closed). Freeze boundary: $FREEZE_DIR"
-  _CEP_FREEZE_DECIDED=1
+  cepg_hook_decision deny "[cepg] Could not parse the tool payload to check the freeze boundary. Blocked (fail closed). Freeze boundary: $FREEZE_DIR"
+  _CEPG_FREEZE_DECIDED=1
   exit 0
 fi
 
 # Parsed fine but no file_path field: a non-file tool payload — allow.
 if [ -z "$FILE_PATH" ]; then
-  _CEP_FREEZE_DECIDED=1
+  _CEPG_FREEZE_DECIDED=1
   echo '{}'
   exit 0
 fi
@@ -165,18 +165,18 @@ FREEZE_DIR=$(_resolve_path "$FREEZE_DIR")
 case "$FILE_PATH" in
   "${FREEZE_DIR}/"*|"${FREEZE_DIR}")
     # Inside freeze boundary — allow
-    _CEP_FREEZE_DECIDED=1
+    _CEPG_FREEZE_DECIDED=1
     echo '{}'
     ;;
   *)
     # Outside freeze boundary — deny
-    # Log hook fire event (shared helper respects CEP_HOME)
-    cep_hook_log_fire freeze-boundary boundary_deny
+    # Log hook fire event (shared helper respects CEPG_HOME)
+    cepg_hook_log_fire freeze-boundary boundary_deny
 
     # The reason is JSON-encoded by the shared helper. Never interpolate
     # paths into hand-built JSON: a path containing a quote or newline
     # produces malformed JSON, and the deny silently no-ops.
-    cep_hook_decision deny "[cep] Blocked: $FILE_PATH is outside the freeze boundary ($FREEZE_DIR). Only edits within the boundary are allowed."
-    _CEP_FREEZE_DECIDED=1
+    cepg_hook_decision deny "[cepg] Blocked: $FILE_PATH is outside the freeze boundary ($FREEZE_DIR). Only edits within the boundary are allowed."
+    _CEPG_FREEZE_DECIDED=1
     ;;
 esac

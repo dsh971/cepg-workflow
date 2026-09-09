@@ -1,13 +1,13 @@
 # Third-party notices
 
-cep is a fork of Compound Engineering, with technique mined from pstack and gstack. All three are MIT-licensed, which permits this, subject to including the notices below — required by MIT's "the above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software" clause, and good practice regardless.
+cepg is a fork of Compound Engineering, with technique mined from pstack and gstack. All three are MIT-licensed, which permits this, subject to including the notices below — required by MIT's "the above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software" clause, and good practice regardless.
 
 ## Compound Engineering
 
 Copyright (c) 2025 Every
 https://github.com/EveryInc/compound-engineering-plugin — MIT License
 
-cep's overall structure (the phase-skill + thin-command-wrapper pattern, `description`-driven routing with no hook-based router, generic-subagent-plus-prompt-file specialist dispatch) and the base content for `skills/cepg-plan/`, `skills/cepg-build/`, `skills/cepg-check-debug/`, `skills/cepg-check-review/` (persona set), and `skills/cepg-learn/` are adapted from Compound Engineering's `ce-plan`, `ce-work`, `ce-debug`, `ce-code-review`, and `ce-compound` skills respectively. The platform-adapter files under `.cursor-plugin/`, `.devin-plugin/`, `.grok-plugin/`, `.kimi-plugin/`, `.agy/`, `plugin.json`, `.opencode/plugins/cep.js`, and `.cline/scripts/install-skills.sh` are near-verbatim ports of Compound Engineering's own adapter files, renamed and re-described for cep.
+cepg's overall structure (the phase-skill + thin-command-wrapper pattern, `description`-driven routing with no hook-based router, generic-subagent-plus-prompt-file specialist dispatch) and the base content for `skills/cepg-plan/`, `skills/cepg-build/`, `skills/cepg-check-debug/`, `skills/cepg-check-review/` (persona set), and `skills/cepg-learn/` are adapted from Compound Engineering's `ce-plan`, `ce-work`, `ce-debug`, `ce-code-review`, and `ce-compound` skills respectively. The platform-adapter files under `.cursor-plugin/`, `.devin-plugin/`, `.grok-plugin/`, `.kimi-plugin/`, `.agy/`, `plugin.json`, `.opencode/plugins/cepg.js`, and `.cline/scripts/install-skills.sh` are near-verbatim ports of Compound Engineering's own adapter files, renamed and re-described for cepg.
 
 ## pstack
 
@@ -25,4 +25,4 @@ https://github.com/garrytan/gstack — MIT License
 
 ## What isn't ported
 
-Neither pstack nor gstack is installed as a live dependency of cep — see `docs/brainstorms/2026-09-02-pstack-ce-plugin-merge-requirements.md` and `docs/plans/2026-09-04-001-feat-unified-ce-pstack-gstack-plugin-plan.md` for why. Everything above is technique and structure mined into cep's own files, not a runtime dependency on either project.
+Neither pstack nor gstack is installed as a live dependency of cepg — see `docs/brainstorms/2026-09-02-pstack-ce-plugin-merge-requirements.md` and `docs/plans/2026-09-04-001-feat-unified-ce-pstack-gstack-plugin-plan.md` for why. Everything above is technique and structure mined into cepg's own files, not a runtime dependency on either project.
