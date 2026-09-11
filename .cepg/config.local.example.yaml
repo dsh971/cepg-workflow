@@ -1,0 +1,19 @@
+# cepg -- local config
+# Copy to .cepg/config.local.yaml in your project root, or set the same key in a
+# tracked .cepg/config.yaml to share it across clones and worktrees.
+# All settings are optional. docs_root fails closed on an invalid value -- see
+# references/artifact-root.md -- every other future setting here would fall
+# through to its default instead.
+
+# --- Artifact root ---
+# Relocate every cepg-written artifact folder (plans, solutions, scope sign-offs)
+# under one repo-relative root. Unset -> `docs`, byte-identical to today.
+# CONCEPTS.md always stays at the repo root regardless of this setting.
+#
+# The value must be a repo-relative directory whose real (symlink-resolved) path
+# stays inside the repo, is not the repo root itself, and is not under `.git/`.
+# An unusable value does NOT fall through to the default -- cepg stops with an
+# error so a typo can't silently write artifacts into the location you configured
+# away from.
+
+# docs_root: .cepg/artifacts   # repo-relative dir (default: docs)

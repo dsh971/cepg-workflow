@@ -6,6 +6,8 @@ argument-hint: "[blank reviews the current branch against its base; or a PR link
 
 **Platform note.** On Codex or another non-Claude runtime, the Claude tool names, `Agent`/`Task` dispatch, and model slugs named below are Claude defaults. Resolve them via [`codex-tools.md`](../../references/codex-tools.md) — this includes the host-detection method the escalation-tier collapse rule (Tier 2) depends on.
 
+**Artifact root note.** Every `docs/...` path below (Protected Artifacts) assumes the default artifact root. A project with a configured `docs_root` relocates it the same way — see [`artifact-root.md`](../../references/artifact-root.md).
+
 # Check — Code Review
 
 ## Outcome
@@ -52,7 +54,11 @@ Read `references/personas/<name>.md` for each persona you select below before di
 
 For an instruction-prose-only diff (Markdown skill files, JSON schemas, config with no runtime behavior), skip the runtime-focused personas (`performance`, `reliability`, `adversarial`) unless the prose itself describes auth/payment/data-mutation behavior or the change is itself a verification mechanism.
 
-Every persona returns the same JSON shape (see any persona file's "Output format"): `reviewer`, `findings[]` (each with `severity` P0-P3, `confidence` 0-100, `file`/`line`, `summary`, `suggested_fix`, `autofix_class`, `owner`), `residual_risks[]`, `testing_gaps[]`.
+Every persona returns the same JSON shape (see any persona file's "Output format"): `reviewer`, `findings[]` (each with `severity` P0-P3, `confidence` 0-100, `file`/`line`, `summary`, `suggested_fix`, `autofix_class`, `owner`), `residual_risks[]`, `testing_gaps[]`. Collect every persona's return before merging, but keep the parent's own visible context to that structured JSON, not each persona's full raw reasoning trace -- mined from pstack's `principle-guard-the-context-window`.
+
+### Protected artifacts
+
+Adapted from Compound Engineering's own `ce-code-review` guard: no reviewer -- `simplification-reviewer` and `maintainability-reviewer` especially -- may flag any file for deletion, removal, or gitignore when it lives under `plans/`, `solutions/`, `scope/`, or the legacy `brainstorms/` **and that directory's own immediate parent is the artifact root** (`docs/`, by default -- see `references/artifact-root.md`). The immediate-parent test qualifies the `plans/`/`solutions/`/`scope/`/`brainstorms/` directory itself, not each individual file underneath it -- so it protects everything nested inside, including category subfolders (e.g. `docs/solutions/<category>/foo.md`), while leaving a same-named directory rooted elsewhere in the repo -- a skill's own `references/personas/` assets, parented by `references`, not by the artifact root -- as ordinary code whose deletion finding stands. These are this plugin's own decision and learning artifacts, not dead weight. Discard any such finding during Phase 5's merge rather than letting it reach the report.
 
 ## Phase 2 — Blast-radius pass
 
@@ -109,7 +115,7 @@ Invoke only on explicit request for a maximally strict pass, or when Phase 1/3 f
 
 1. **Fingerprint every finding** across every tier that ran (personas, blast-radius, both escalation paths, thermo-nuclear) as `file:line:category` (or `file:category` when no line applies). Findings sharing a fingerprint are the same issue seen from a different lens, not separate findings.
 2. **Merge duplicates**: keep the higher-confidence version, tag it with every tier/persona that raised it, and boost confidence when 2+ independent tiers agree (mirrors gstack's multi-specialist confirmation). This is what makes the "no duplicate findings across tiers" verification criterion hold — a finding both `security-reviewer` and Tier 1b's Codex pass raised is one line in the report with both sources credited, not two.
-3. **Apply the severity/confidence gate**: P0/P1 always surface; P2/P3 at low confidence (anchor ≤25 per the persona files) are suppressed; simplification and comment-hygiene findings are always shown separately from the severity-gated set, never folded into a "quality score."
+3. **Apply the severity/confidence gate**: P0/P1 always surface; P2/P3 at low confidence (anchor ≤25 per the persona files) are suppressed; simplification and comment-hygiene findings are always shown separately from the severity-gated set, never folded into a "quality score." Drop any finding that trips the Protected Artifacts guard above before it reaches this gate -- a correctly-scoped deletion finding never needed the guard in the first place.
 4. **Render the report**: verdict (Ready to merge / Ready with fixes / Not ready), findings grouped by severity with source tier(s) credited, the blast-radius safety fact and its proof level, the comment-hygiene section, and — when escalation ran — the Tier 1 synthesis and, when Phase 4 ran, a pointer to its detail files.
 5. Never push, open a PR, or apply fixes from this skill unless the caller explicitly authorized local apply for this invocation; report-only is the default, matching Build's Gate 3 default-to-reversible/pause-on-irreversible framing (this skill's default output is inherently reversible — a report — so no confirmation is needed to produce it).
 

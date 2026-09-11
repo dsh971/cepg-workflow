@@ -8,6 +8,10 @@ argument-hint: <feature or idea description, or a path to a doc describing it>
 model slugs named below are Claude defaults. Resolve them via
 [`codex-tools.md`](../../references/codex-tools.md).
 
+**Artifact root note.** Every `docs/...` path below assumes the default artifact
+root. A project with a configured `docs_root` relocates all of them the same way —
+see [`artifact-root.md`](../../references/artifact-root.md).
+
 # Scope
 
 Scope is a sign-off pass, not a planning tool. It runs before the Plan skill and

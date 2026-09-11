@@ -68,6 +68,7 @@ cepg has no dedicated setup/preflight skill — a seventh command was deliberate
 - `gh` is installed and authenticated (`gh auth status`) — `/cepg-ship` uses it for PR creation and CI status.
 - The hook scripts are executable (`chmod +x hooks/*.sh`) if your platform's install step didn't preserve the bit.
 - `${CLAUDE_PLUGIN_DATA:-~/.cepg}` is writable — this is where the safety hooks keep their state (e.g. the freeze boundary).
+- (Optional) If `docs/` is already tracked content owned by something else, set `docs_root` in `.cepg/config.yaml` or `.cepg/config.local.yaml` to relocate every cepg-written artifact folder — see [`references/artifact-root.md`](references/artifact-root.md). Unset, nothing changes.
 
 Nothing in cepg checks these for you ahead of time; a missing prerequisite surfaces as a failure mid-run rather than upfront.
 

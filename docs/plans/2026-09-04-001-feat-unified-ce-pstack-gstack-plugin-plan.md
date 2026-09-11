@@ -328,6 +328,28 @@ None of gstack's iOS, browser-automation, safety-lock, diagramming, or PDF-publi
 - pstack `skills/tdd/SKILL.md`, `skills/architect/SKILL.md`, `skills/interrogate/SKILL.md`, `hooks/hooks.json`, `skills/poteto-mode/references/codex-tools.md`, `commands/*.md` — mined patterns for U2, U4-U7, U9.
 - gstack (github.com/garrytan/gstack) `plan-eng-review/SKILL.md`, `review/SKILL.md`, `review/sections/review-army.md`, `review/specialists/*.md`, `codex/SKILL.md`, `land-and-deploy/SKILL.md`, `careful/SKILL.md`, `guard/SKILL.md` — mined content for U3, U7, U8, U9.
 - gstack `careful/bin/check-careful.sh` and `freeze/bin/check-freeze.sh` (read in full via direct fetch during planning) — source of the two-tier decision model, the `hookSpecificOutput` nesting requirement, the tier-dependent fail-safe polarity, the symlink-resolution subtlety, and the documented naive-JSON-extraction bug class carried into U9's Approach.
+- pstack `skills/{swarm,arena,why,teach,figure-it-out,fix-ci,fix-merge-conflicts,make-pr-easy-to-review}/SKILL.md` (read in full post-plan, 2026-09-11) — mined patterns for the Amendments entry below.
+
+---
+
+## Amendments
+
+**2026-09-11 — Expanded pstack mining beyond this plan's original Sources.** On explicit user request, eight additional pstack techniques were mined as native prose into the shipped skills, beyond what U2-U10's Approach sections and the Sources list above originally drew on:
+
+| pstack skill | Landed in | Concern |
+|---|---|---|
+| `swarm` | Build (U5), Phase 2 | Fan out N parallel workers for coverage/exploration/races |
+| `arena` | Build (U5), Phase 2 | Fan out N candidates on one hard, ambiguous unit; pick a base, graft the rest |
+| `why` | Check — debug (U6), Phase 2 | Deeper rationale investigation when a bug traces to a design decision |
+| `teach` | Plan (U4), Phase 1 | Plain mental model of an unfamiliar subsystem before structuring units |
+| `figure-it-out` | Plan (U4), Phase 0 | Rigor escalation above Deep for large migrations / ambitious multi-part work |
+| `fix-ci` | Ship (U8), Phase 3 | Fleshes out the existing "Failing checks" babysit-loop triage bullet |
+| `fix-merge-conflicts` | Ship (U8), Phase 3 | Fleshes out the existing "Merge conflicts" babysit-loop triage bullet |
+| `make-pr-easy-to-review` | Ship (U8), Phase 2 | Reviewability step for noisy branch history before PR creation |
+
+This narrows, not reverses, the Scope Boundaries stance above: R3 (no live pstack dependency — every technique is rewritten into cepg's own prose, matching how `tdd`/`architect`/`interrogate`/`babysit`/`thermo-nuclear-code-quality-review` were already mined) and the six-command surface both hold unchanged. What moved is the boundary on *how much* of pstack's content counts as worth mining — the original "not the union of ~100+ source commands" framing was about command-surface sprawl, not a cap on how many individual techniques get folded into the six phases' own prose. `pstack`'s `principle-*` skills and gstack's remaining unmined content are still out of scope; nothing here revisits that.
+
+Five other pstack techniques the same request named (`tdd`, `architect`, `interrogate`, `babysit`, `thermo-nuclear-code-quality-review`) were already mined per the original plan — confirmed via `grep`, no change needed there.
 
 ---
 
