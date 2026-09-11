@@ -3,3 +3,4 @@
 .claude/worktrees/
 node_modules/
 .cepg/config.local.yaml
+PLAN.md
